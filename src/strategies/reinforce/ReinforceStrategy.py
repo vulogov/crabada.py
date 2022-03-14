@@ -13,12 +13,35 @@ from src.helpers.reinforce import (
 )
 from src.strategies.Strategy import Strategy
 from src.libs.CrabadaWeb2Client.types import CrabForLending, Game, TeamStatus
+from src.strategies.reinforce.CrabBlacklist import CrabBlacklist
 
 
 class ReinforceStrategy(Strategy):
     """
-    Generic mining strategy, assuming the game has already
-    started
+    Generic strategy to fetch the best possible crab to reinforce
+    the given mine.
+
+    Extend this class and override the query(), crab() and,
+    optionally, crab2() methods in order to define a complete
+    strategy.
+
+    The strategy can be used by calling the crab() method to
+    fetch the first reinforcement, and the crab2() method to
+    fetch the second one.
+
+    Multiple calls of the strategy will never fetch the same
+    crab, in order to avoid concurrency issues for users with
+    multiple teams.
+
+    Attributes
+    ----------
+    game: Game
+    maxPrice: Tus
+    maxPrice2: Tus
+
+    Derived attributes
+    ----------
+    blacklist: CrabBlacklist
     """
 
     def setParams(
@@ -35,6 +58,7 @@ class ReinforceStrategy(Strategy):
         self.game: Game = game
         self.maxPrice1: Tus = maxPrice
         self.maxPrice2: Tus = maxPrice2 if maxPrice2 else self.maxPrice1
+        self.blacklist = CrabBlacklist()
         return self
 
     def isApplicable(self) -> Tuple[bool, str]:
@@ -67,7 +91,8 @@ class ReinforceStrategy(Strategy):
     def crab(self, game: Game, list: List[CrabForLending]) -> CrabForLending:
         """
         Strategy to pick the first reinforcement crab from the list of
-        available crabs; by default simply pick the first of the list.
+        available crabs; by default simply pick the first of the list,
+        as long as it is not blacklisted.
         """
         return firstOrNone(list)
 
