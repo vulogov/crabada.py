@@ -1,13 +1,5 @@
-# general things to ignore
-build/
-dist/
-*.egg-info/
-*.egg
-*.py[cod]
-__pycache__/
-*.so
-*~
-.env
+__pycache__
+*.pyc
 .history
 reports/
 .DS_Store
